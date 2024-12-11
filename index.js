@@ -1,26 +1,23 @@
-const express = require('express');
-const mysql = require('./mysql');
+const express = require("express");
+const mysql = require("./mysql");
 
-const path = require('path');
+const path = require("path");
 
 const app = express();
 
 app.use(express.urlencoded({ extended: true }));
+// Handles JSON
+app.use(express.json());
 
-
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'pages'));
-
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "pages"));
 
 app.listen(3004, () => {
-    console.log("Running on port 3004")
-})
+  console.log("Running on port 3004");
+});
 
-
-   
-
-app.get('/', (req, res) => {
-    res.send(`
+app.get("/", (req, res) => {
+  res.send(`
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -102,67 +99,104 @@ app.get('/', (req, res) => {
     `);
 });
 
-
 app.get("/students", async (req, res) => {
-    try {
-        const students = await mysql.getStudents();
-        res.render("students", { students }); // Pass students data to the view
-    } catch (error) {
-        console.error("Error fetching students:", error);
-        res.status(500).send("Error loading students");
-    }
+  try {
+    const students = await mysql.getStudents();
+    res.render("students", { students }); // Pass students data to the view
+  } catch (error) {
+    console.error("Error fetching students:", error);
+    res.status(500).send("Error loading students");
+  }
 });
 
+app.get("/students/add", (req, res) => {
+    console.log("Add Student page requested");
+    res.render("addStudent", { errors: null, student: {} });
+  });
 
-app.get("/students/edit/:sid", async (req, res) => {
-    const studentId = req.params.sid;  // Capture the student ID from the URL
+  app.post("/students/add", async (req, res) => {
+    const { sid, name, age } = req.body;
+    let errors = {};
+    let student = { sid, name, age };
+
+    // Validation logic
+    if (!sid || sid.length !== 4) {
+      errors.sid = "Student ID must be exactly 4 characters.";
+    }
+    if (!name || name.length < 2) {
+      errors.name = "Name must be at least 2 characters.";
+    }
+    if (!age || age < 18) {
+      errors.age = "Age must be 18 or older.";
+    }
+
+    // If there are validation errors, return the form with the error messages and previously entered data
+    if (Object.keys(errors).length > 0) {
+      return res.render("addStudent", { errors, student });
+    }
 
     try {
-        // Fix: Use pool.promise() to get the promise-based query interface
-        const [students] = await mysql.pool.promise().query('SELECT * FROM student WHERE sid = ?', [studentId]);
+      // If data is valid, insert the student into the database
+      await mysql.pool
+        .promise()
+        .query("INSERT INTO student (sid, name, age) VALUES (?, ?, ?)", [
+          sid,
+          name,
+          age,
+        ]);
 
-        if (students.length > 0) {
-            const student = students[0];  // Get the student details
-            res.render("updateStudent", { student });  // Render the updateStudent page with student data
-        } else {
-            res.status(404).send("Student not found");
-        }
+      // Redirect to the students page after successful insertion
+      res.redirect("/students");
     } catch (error) {
-        console.error("Error fetching student details:", error);
-        res.status(500).send("Error fetching student details");
+      console.error("Error adding student:", error);
+      res.status(500).send("Error adding student");
     }
+  });
+
+app.get("/students/edit/:sid", async (req, res) => {
+  // Capture the student ID from the URL
+  const studentId = req.params.sid;
+
+  try {
+    // Fix: Use pool.promise() to get the promise-based query interface
+    const [students] = await mysql.pool
+      .promise()
+      .query("SELECT * FROM student WHERE sid = ?", [studentId]);
+
+    if (students.length > 0) {
+      // Get the student details
+      const student = students[0];
+      // Render the updateStudent page with student data
+      res.render("updateStudent", { student });
+    } else {
+      res.status(404).send("Student not found");
+    }
+  } catch (error) {
+    console.error("Error fetching student details:", error);
+    res.status(500).send("Error fetching student details");
+  }
 });
 
 app.post("/students/update/:sid", async (req, res) => {
-    const studentId = req.params.sid;
-    const { name, age } = req.body;
+  const studentId = req.params.sid;
+  const { name, age } = req.body;
 
-    try {
-        // Update student details in the database
-        await mysql.pool.promise().query(
-            'UPDATE student SET name = ?, age = ? WHERE sid = ?',
-            [name, age, studentId]
-        );
+  try {
+    // Update student details in the database
+    await mysql.pool
+      .promise()
+      .query("UPDATE student SET name = ?, age = ? WHERE sid = ?", [
+        name,
+        age,
+        studentId,
+      ]);
 
-        // Redirect back to the students page after the update
-        res.redirect("/students");
-    } catch (error) {
-        console.error("Error updating student details:", error);
-        res.status(500).send("Error updating student details");
-    }
-});
-
-app.get("/addStudent", (req, res) => {
-    res.render("addStudent");  // This will render addStudent.ejs
-});
-
-app.get("/updateStudent/:id", (req, res) => {
-    // Capture the student ID from the URL
-    const studentId = req.params.id;  
-   
-
-    // render the updateStudent page with the studentId
-    res.render("updateStudent", { studentId });
+    // Redirect back to the students page after the update
+    res.redirect("/students");
+  } catch (error) {
+    console.error("Error updating student details:", error);
+    res.status(500).send("Error updating student details");
+  }
 });
 
 
