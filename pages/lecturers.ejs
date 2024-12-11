@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecturers</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+        nav {
+            margin-top: 20px;
+            text-align: center;
+        }
+        nav a {
+            text-decoration: none;
+            color: #4CAF50;
+            font-size: 1.2em;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        nav a:hover {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .lecturers-container {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            border-radius: 5px;
+        }
+        .lecturer {
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+        }
+        .lecturer:last-child {
+            border-bottom: none;
+        }
+        .lecturer h3 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+        .lecturer p {
+            margin: 5px 0 0;
+            color: #555;
+        }
+        footer {
+            text-align: center;
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .delete-link {
+            color: #ff4d4d;
+            text-decoration: none;
+            padding: 5px 25px;
+            border: 1px solid #ff4d4d;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            margin-left: 700px;
+        }
+        .delete-link:hover {
+            background-color: #ff4d4d;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Lecturers</h1>
+    </header>
+
+    <nav>
+        <!-- Back to Home Button -->
+        <a href="/" class="home-button">Go Back to Home</a>
+    </nav>
+
+    <div class="lecturers-container">
+        <% if (lecturers && lecturers.length > 0) { %>
+            <% lecturers.forEach(lecturer => { %>
+                <div class="lecturer">
+                    <div class="lecturer-details">
+                        <h3><%= lecturer.name %></h3>
+                        <p><strong>ID:</strong> <%= lecturer._id %></p>
+                        <p><strong>Department ID:</strong> <%= lecturer.did %></p>
+                    </div>
+                    <a class="delete-link" href="/lecturers/delete/<%= lecturer._id %>">Delete</a>
+                </div>
+            <% }); %>
+        <% } else { %>
+            <p>No lecturers found.</p>
+        <% } %>
+    </div>
+
+</body>
+</html>

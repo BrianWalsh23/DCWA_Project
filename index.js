@@ -3,7 +3,12 @@ const mysql = require("./mysql");
 
 const path = require("path");
 
+// MongoDB
+const { connectToDatabase, getLecturers } = require("./mongodb");
+
 const app = express();
+
+
 
 app.use(express.urlencoded({ extended: true }));
 // Handles JSON
@@ -30,40 +35,52 @@ app.get("/", (req, res) => {
             background-color: #f4f4f9;
             margin: 0;
             padding: 0;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
         header {
             background-color: #4CAF50;
             color: white;
             text-align: center;
             padding: 20px;
+            width: 100%;
         }
         header h1 {
             margin: 0;
             font-size: 3em;
         }
         nav {
-            margin-top: 20px;
+            margin-top: 50px;
             text-align: center;
         }
         nav ul {
             list-style-type: none;
             padding: 0;
+            display: flex;
+            flex-direction: column; /* Stack buttons vertically */
+            gap: 20px; /* Add space between the buttons */
         }
         nav ul li {
             display: inline;
             margin: 0 15px;
         }
         nav ul li a {
+            display: block;
+            padding: 20px 40px;
+            font-size: 1.5em;
+            font-weight: bold;
             text-decoration: none;
-            color: #4CAF50;
-            font-size: 1.2em;
-            padding: 10px 15px;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-        }
-        nav ul li a:hover {
             background-color: #4CAF50;
             color: white;
+            border-radius: 10px;
+            width: 200px;
+            text-align: center;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+        nav ul li a:hover {
+            background-color: #45a049;
+            transform: scale(1.1);
         }
         footer {
             position: fixed;
@@ -222,6 +239,64 @@ app.get("/grades", async (req, res) => {
   
   
   
+
+  (async () => {
+    try {
+        db = await connectToDatabase();
+        console.log("Connected to MongoDB!");
+    } catch (error) {
+        console.error("MongoDB connection failed:", error);
+    }
+})();
+
+app.get("/lecturers", async (req, res) => {
+  try {
+      const lecturers = await getLecturers();
+      res.render("lecturers", { lecturers });
+  } catch (error) {
+      console.error("Error loading lecturers:", error);
+      res.status(500).send("Error loading lecturers");
+  }
+});
+
+app.get("/lecturers/delete/:lid", async (req, res) => {
+  const lecturerId = req.params.lid;
+
+  try {
+      // Check if the lecturer teaches any modules
+      const moduleCount = await db.collection("modules").countDocuments({ lecturerId: lecturerId });
+
+      if (moduleCount > 0) {
+          // Lecturer teaches modules; cannot delete
+          console.log(`Lecturer with ID ${lecturerId} cannot be deleted as they teach ${moduleCount} module(s).`);
+          return res.status(400).send(`
+              <p>Cannot delete lecturer because they teach ${moduleCount} module(s).</p>
+              <a href="/lecturers">Go Back to Lecturers</a>
+          `);
+      }
+
+      
+
+      // If no modules are taught, delete the lecturer
+      const result = await db.collection("lecturers").deleteOne({ _id: new require('mongodb').ObjectId(lecturerId) });
+
+      if (result.deletedCount > 0) {
+          console.log(`Lecturer with ID ${lecturerId} deleted successfully.`);
+      } else {
+          console.log(`No lecturer found with ID ${lecturerId}.`);
+      }
+
+      // Redirect to the Lecturers page
+      res.redirect("/lecturers");
+  } catch (error) {
+      console.error("Error deleting lecturer:", error);
+      res.status(500).send("Error deleting lecturer");
+  }
+});
+
+
+
+
   
   
 
