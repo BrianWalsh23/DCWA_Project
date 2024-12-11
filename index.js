@@ -115,4 +115,13 @@ app.get("/addStudent", (req, res) => {
     res.render("addStudent");  // This will render addStudent.ejs
 });
 
+app.get("/updateStudent/:id", (req, res) => {
+    // Capture the student ID from the URL
+    const studentId = req.params.id;  
+   
+
+    // render the updateStudent page with the studentId
+    res.render("updateStudent", { studentId });
+});
+
 
