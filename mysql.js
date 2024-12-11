@@ -1,34 +1,25 @@
-var pmysql = require('promise-mysql')
+var pmysql = require('mysql2');
 
-var pool
+// Initialize the pool
+var pool = pmysql.createPool({
+    connectionLimit: 3,
+    host: 'localhost',
+    user: 'root',
+    password: 'root',
+    database: 'proj2024Mysql',
+})
 
-pmysql.createPool({
-    connectionLimit : 3,
-    host : 'localhost',
-    user : 'root',
-    password : 'root',
-    database : 'proj2024Mysql'
-    })
-    .then((p) => {
-       pool = p
-    })
-    .catch((e) => {
-        console.log("pool error:" + e)
-   })
-// Read through every line in DB
-var getStudents = function() {
-    return new Promise((resolve, reject) => {
-        //reading students from mySQL
-        pool.query('SELECT * FROM student')
-        .then((data) => {
-            console.log(data)
-            resolve(data)
+
+// Fetch all students
+var getStudents = function () {
+    return pool.promise().query('SELECT * FROM student')  // Using promise() for queries
+        .then(([rows, fields]) => {
+            return rows;  // Return the student data (rows)
         })
         .catch((error) => {
-            console.log(error)
-            reject(error)
-        })
-    })
-}
+            console.log(error);
+            throw error;  // Throw the error if any
+        });
+};
 
-module.exports = { getStudents } 
+module.exports = { getStudents };

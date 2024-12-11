@@ -1,15 +1,19 @@
 <h1>Students</h1>
-<table></table>
+<table border="1">
+  <thead>
     <tr>
-        <th>Student ID</th>
-        <th></th>
-        <th>Salary</th>
+      <th>Student ID</th>
+      <th>Name</th>
+      <th>Age</th>
     </tr>
-    <% students.forEach(student => { %> <!-- Changed from 'student' to 'students' -->
+  </thead>
+  <tbody>
+    <% students.forEach(student => { %> 
     <tr>
       <td><%= student.sid %></td>
       <td><%= student.name %></td>
       <td><%= student.age %></td>
     </tr>
-  <% }); %>
+    <% }); %>
+  </tbody>
 </table>
