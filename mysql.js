@@ -10,6 +10,8 @@ var pool = pmysql.createPool({
 })
 
 
+
+
 // Fetch all students
 var getStudents = function () {
     return pool.promise().query('SELECT * FROM student')  // Using promise() for queries
@@ -22,4 +24,4 @@ var getStudents = function () {
         });
 };
 
-module.exports = { getStudents };
+module.exports = { getStudents, pool };

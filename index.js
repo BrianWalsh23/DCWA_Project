@@ -5,6 +5,8 @@ const path = require('path');
 
 const app = express();
 
+app.use(express.urlencoded({ extended: true }));
+
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'pages'));
@@ -108,6 +110,45 @@ app.get("/students", async (req, res) => {
     } catch (error) {
         console.error("Error fetching students:", error);
         res.status(500).send("Error loading students");
+    }
+});
+
+
+app.get("/students/edit/:sid", async (req, res) => {
+    const studentId = req.params.sid;  // Capture the student ID from the URL
+
+    try {
+        // Fix: Use pool.promise() to get the promise-based query interface
+        const [students] = await mysql.pool.promise().query('SELECT * FROM student WHERE sid = ?', [studentId]);
+
+        if (students.length > 0) {
+            const student = students[0];  // Get the student details
+            res.render("updateStudent", { student });  // Render the updateStudent page with student data
+        } else {
+            res.status(404).send("Student not found");
+        }
+    } catch (error) {
+        console.error("Error fetching student details:", error);
+        res.status(500).send("Error fetching student details");
+    }
+});
+
+app.post("/students/update/:sid", async (req, res) => {
+    const studentId = req.params.sid;
+    const { name, age } = req.body;
+
+    try {
+        // Update student details in the database
+        await mysql.pool.promise().query(
+            'UPDATE student SET name = ?, age = ? WHERE sid = ?',
+            [name, age, studentId]
+        );
+
+        // Redirect back to the students page after the update
+        res.redirect("/students");
+    } catch (error) {
+        console.error("Error updating student details:", error);
+        res.status(500).send("Error updating student details");
     }
 });
 
