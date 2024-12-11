@@ -104,7 +104,7 @@ app.get("/students", async (req, res) => {
     const students = await mysql.getStudents();
     res.render("students", { students }); // Pass students data to the view
   } catch (error) {
-    console.error("Error fetching students:", error);
+    console.error("Error loading students:", error);
     res.status(500).send("Error loading students");
   }
 });
@@ -198,5 +198,31 @@ app.post("/students/update/:sid", async (req, res) => {
     res.status(500).send("Error updating student details");
   }
 });
+
+app.get("/grades", async (req, res) => {
+    try {
+      // Fetch the grades, student names, and module names in the correct order
+      const [grades] = await mysql.pool
+        .promise()
+        .query(`
+          SELECT s.sid, s.name AS student_name, m.name AS module_name, g.grade
+          FROM student s
+          LEFT JOIN grade g ON s.sid = g.sid
+          LEFT JOIN module m ON g.mid = m.mid
+          ORDER BY s.name, g.grade ASC;
+        `);
+  
+      // Render the grades page with the fetched data
+      res.render("grades", { grades });
+    } catch (error) {
+      console.error("Error loading grades:", error);
+      res.status(500).send("Error loading grades");
+    }
+  });
+  
+  
+  
+  
+  
 
 

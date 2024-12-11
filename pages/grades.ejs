@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grades Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        header h1 {
+            margin: 0;
+        }
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            text-align: center;
+            background-color: #333;
+            color: white;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Grades</h1>
+
+    <!-- Back to Home -->
+    <p><a href="/">Back to Home</a></p>
+    
+    <table border="1">
+      <thead>
+        <tr>
+          <th>Student Name</th>
+          <th>Module Name</th>
+          <th>Grade</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% grades.forEach(grade => { %>
+          <tr>
+            <td><%= grade.student_name %></td>
+            <td><%= grade.module_name || 'No Modules' %></td>
+            <td><%= grade.grade || 'N/A' %></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+    
+
+    <footer>
+        <p>&copy; 2024 G00424410 Project</p>
+        <a href="/" style="color: white; text-decoration: none;">Home</a>
+    </footer>
+
+</body>
+</html>
