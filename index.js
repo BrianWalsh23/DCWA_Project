@@ -111,4 +111,8 @@ app.get("/students", async (req, res) => {
     }
 });
 
+app.get("/addStudent", (req, res) => {
+    res.render("addStudent");  // This will render addStudent.ejs
+});
+
 
