@@ -19,8 +19,10 @@ app.get("/", (req, res) => {
 app.get("/students", (req, res) => {
     mysql.getStudents()
         .then((data) => {
-            console.log("Retrieved students:", data); // Log the retrieved data for debugging
-            res.status(200).json(data); // Send data as JSON with a success status code
+            // Log the retrieved data for debugging
+            console.log("Retrieved students:", data); 
+            // Send data as JSON with a success status code
+            res.status(200).json(data); 
         })
         .catch((error) => {
             console.error("Error fetching students:", error); // Log the error
