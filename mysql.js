@@ -7,7 +7,7 @@ pmysql.createPool({
     host : 'localhost',
     user : 'root',
     password : 'root',
-    database : 'studentdb4'
+    database : 'proj2024Mysql'
     })
     .then((p) => {
        pool = p
@@ -15,10 +15,11 @@ pmysql.createPool({
     .catch((e) => {
         console.log("pool error:" + e)
    })
-
+// Read through every line in DB
 var getStudents = function() {
     return new Promise((resolve, reject) => {
-        pool.query('SELECT * FROM student_table')
+        //reading students from mySQL
+        pool.query('SELECT * FROM student')
         .then((data) => {
             console.log(data)
             resolve(data)
