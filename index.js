@@ -9,7 +9,6 @@ const { connectToDatabase, getLecturers } = require("./mongodb");
 const app = express();
 
 
-
 app.use(express.urlencoded({ extended: true }));
 // Handles JSON
 app.use(express.json());
@@ -116,16 +115,20 @@ app.get("/", (req, res) => {
     `);
 });
 
+// Route to fetch and display the list of students
 app.get("/students", async (req, res) => {
   try {
+    // Fetch students data from the database
     const students = await mysql.getStudents();
-    res.render("students", { students }); // Pass students data to the view
+    // Render the students view and pass the fetched data
+    res.render("students", { students });
   } catch (error) {
     console.error("Error loading students:", error);
     res.status(500).send("Error loading students");
   }
 });
 
+// Route to display the "Add Student" page
 app.get("/students/add", (req, res) => {
     console.log("Add Student page requested");
     res.render("addStudent", { errors: null, student: {} });
